@@ -25,6 +25,7 @@ def filter_paths(paths, threshold = 0.01):
     for i in range(np.shape(paths)[0]):
         if get_path_length(paths[i,1:]) > threshold:
             wanted_paths.append(i)
+    print("Started with {}, ended with {} after threshold of {}.".format(np.shape(paths)[0], len(wanted_paths), threshold))
     return paths[wanted_paths, :]
     
 #path is a 1x3n vector
@@ -77,8 +78,8 @@ def reshape_to_distances(paths):
 # 0 - indices
 # 1 - paths
 
-def filter_and_reshape_paths(dinodata, threshold=.007, rezero=False, rebase=False, rebase_resolution=100):
-    filtered_data = filter_paths(dinodata, .007)
+def filter_and_reshape_paths(dinodata, threshold=.02, rezero=False, rebase=False, rebase_resolution=100):
+    filtered_data = filter_paths(dinodata, threshold)
     indices = filtered_data[:,0]
     paths = filtered_data[:,1:]
     if rezero:
@@ -255,7 +256,9 @@ def write_file(filename='pca-OLD_TEMP_FILENAME.clusters', outstr=''):
 #inFile is the data file to be read
 #n_clusters is a list of the number of clusters to be determined.
 def run(inFile= 'scripts/slices-1k.out', n_clusters = [50, 100], printMethods = [(labels_clusters, 'clusters'), (labels_pathlines, 'pathlines')]):
+    print("Reading file {}".format(inFile))
     dinodata, indices, paths = load_dinosaur_data(inFile)
+    print("File Read.")
     indices, paths = filter_and_reshape_paths(dinodata)
     m = run_pca(paths)
     mask = get_mask(100000, m.shape[0])
@@ -269,7 +272,7 @@ def run(inFile= 'scripts/slices-1k.out', n_clusters = [50, 100], printMethods = 
         for fun, label in printMethods:
             print('pca-dataset-{}.{}'.format(clusters, label))
             labelmap = generate_labelmap(labels, indices)
-            write_file('pca-dataset-{}.{}'.format(clusters, label), labels_clusters(labelmap))
+            write_file('pca-dataset-{}.{}'.format(clusters, label), fun(labelmap))
     
     
 if __name__ == '__main__':
