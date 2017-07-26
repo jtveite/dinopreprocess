@@ -13,4 +13,7 @@ pca-dataset-50.clusters: dataset.out
 dataset-.01.tris: dataset.out
 	python3 scripts/Surfaces.py dataset.out 4 0.1 0.05 0.03 0.01 0.005
 
-all: dataset.out  dataset-.01.tris pca-dataset-50.clusters
+dataset.feet: dataset.lammps
+	python3 scripts/create_foot_file.py dataset.lammps footcomp2_ .vtk feet/dataset dataset.feet
+
+all: dataset.out  dataset-0.01.tris pca-dataset-50.clusters dataset.feet
